@@ -1,5 +1,5 @@
 # Use the official Node.js 18 Alpine image as the base
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -8,31 +8,22 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy the rest of the application code
 COPY . .
 
 # Create the weddingPhotos directory and set permissions
-RUN mkdir -p public/weddingPhotos && chmod 755 public/weddingPhotos
-
-# Build the Next.js application
-RUN npm run build
+RUN mkdir -p public/weddingPhotos && chmod 777 public/weddingPhotos
 
 # Expose the port that the app will run on
 EXPOSE 3000
 
 # Set environment variables
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 ENV PORT=3000
 
-# Create a non-root user for security
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-# Change ownership of the app directory and weddingPhotos to the nodejs user
-RUN chown -R nextjs:nodejs /app
-USER nextjs
+# Run as root for volume write access (simplified for this use case)
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]

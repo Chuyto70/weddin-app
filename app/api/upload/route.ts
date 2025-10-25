@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Local development - create directory and save file
+    // Production - save to mounted volume
     const uploadDir = join(process.cwd(), 'public', 'weddingPhotos');
     try {
       await mkdir(uploadDir, { recursive: true });
