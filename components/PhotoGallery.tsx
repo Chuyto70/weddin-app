@@ -32,7 +32,7 @@ export default function PhotoGallery() {
       <div className="text-center py-12">
         <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-8 py-6 shadow-lg">
           <div className="animate-spin rounded-full h-6 w-6 border-2 border-rose-500 border-t-transparent"></div>
-          <p className="text-gray-700 font-medium">Loading beautiful moments...</p>
+          <p className="text-gray-700 font-medium">Cargando momentos hermosos...</p>
         </div>
       </div>
     );
@@ -45,9 +45,9 @@ export default function PhotoGallery() {
           <div className="w-20 h-20 bg-gradient-to-r from-rose-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-3xl">📷</span>
           </div>
-          <h3 className="text-2xl font-semibold text-gray-800 mb-4">No photos yet</h3>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-4">Aún no hay fotos</h3>
           <p className="text-gray-600 max-w-md mx-auto">
-            Be the first to capture and share a beautiful moment from this special day!
+            ¡Sé el primero en capturar y compartir un momento hermoso de este día especial!
           </p>
         </div>
       </div>
@@ -59,10 +59,10 @@ export default function PhotoGallery() {
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
           <span className="text-2xl">💍</span>
-          Wedding Gallery
+          Galería de la Boda
         </h2>
         <div className="text-sm text-gray-600 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full">
-          {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+          {photos.length} {photos.length === 1 ? 'foto' : 'fotos'}
         </div>
       </div>
 
@@ -74,7 +74,7 @@ export default function PhotoGallery() {
           >
             <Image
               src={photo.url}
-              alt={`Wedding photo ${index + 1}`}
+              alt={`Foto de la boda ${index + 1}`}
               fill
               unoptimized
               className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -82,7 +82,7 @@ export default function PhotoGallery() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              Photo {index + 1}
+              Foto {index + 1}
             </div>
           </div>
         ))}
