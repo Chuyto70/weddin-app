@@ -1,26 +1,146 @@
 @import "tailwindcss";
+ :root {
+    /* Romantic wedding color palette */
+    --background: 20 20% 98%;
+    --foreground: 340 15% 25%;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --card: 0 0% 100%;
+    --card-foreground: 340 15% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 15% 25%;
+
+    /* Soft rose primary */
+    --primary: 340 75% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Golden secondary */
+    --secondary: 45 85% 70%;
+    --secondary-foreground: 340 15% 25%;
+
+    --muted: 20 15% 92%;
+    --muted-foreground: 340 10% 45%;
+
+    /* Peach accent */
+    --accent: 25 90% 75%;
+    --accent-foreground: 340 15% 25%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 340 15% 90%;
+    --input: 340 15% 90%;
+    --ring: 340 75% 65%;
+
+    --radius: 1rem;
+
+    /* Gradients */
+    --gradient-romantic: linear-gradient(135deg, hsl(340 75% 65%), hsl(25 90% 75%));
+    --gradient-subtle: linear-gradient(180deg, hsl(20 20% 98%), hsl(340 35% 95%));
+    --gradient-gold: linear-gradient(135deg, hsl(45 85% 70%), hsl(35 80% 65%));
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(340 75% 65% / 0.15);
+    --shadow-glow: 0 0 30px hsl(340 75% 65% / 0.2);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 340 25% 8%;
+    --foreground: 20 20% 95%;
+
+    --card: 340 20% 12%;
+    --card-foreground: 20 20% 95%;
+
+    --popover: 340 20% 12%;
+    --popover-foreground: 20 20% 95%;
+
+    --primary: 340 75% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 45 70% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 340 15% 20%;
+    --muted-foreground: 20 15% 65%;
+
+    --accent: 25 80% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 340 20% 20%;
+    --input: 340 20% 20%;
+    --ring: 340 75% 65%;
+  }
+
+
+   .gradient-romantic {
+    background: var(--gradient-romantic);
+  }
+
+  .gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+
+  .gradient-gold {
+    background: var(--gradient-gold);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  #root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
 }

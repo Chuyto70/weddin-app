@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  wedding-photo-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      # Mount the weddingPhotos directory to persist uploaded images
+      - ./public/weddingPhotos:/app/public/weddingPhotos
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
