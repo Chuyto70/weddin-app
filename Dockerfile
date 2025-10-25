@@ -13,6 +13,9 @@ RUN npm ci --only=production
 # Copy the rest of the application code
 COPY . .
 
+# Create the weddingPhotos directory and set permissions
+RUN mkdir -p public/weddingPhotos && chmod 755 public/weddingPhotos
+
 # Build the Next.js application
 RUN npm run build
 
@@ -27,7 +30,7 @@ ENV PORT=3000
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-# Change ownership of the app directory to the nodejs user
+# Change ownership of the app directory and weddingPhotos to the nodejs user
 RUN chown -R nextjs:nodejs /app
 USER nextjs
 
