@@ -57,10 +57,6 @@ export default function PhotoGallery() {
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-          <span className="text-2xl">💍</span>
-          Galería de la Boda
-        </h2>
         <div className="text-sm text-gray-600 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full">
           {photos.length} {photos.length === 1 ? 'foto' : 'fotos'}
         </div>

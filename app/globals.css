@@ -1,94 +1,122 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: oklch(0.98 0.01 95.0); /* Blanco cálido */
+  --color-foreground: oklch(0.48 0.07 150.5); /* Verde oscuro */
+  
+  --color-primary: oklch(0.48 0.07 150.5); /* Verde oscuro */
+  --color-primary-foreground: oklch(0.98 0.01 95.0); /* Texto claro */
+
+  --color-secondary: oklch(0.92 0.04 96.3); /* Amarillo floral */
+  --color-secondary-foreground: oklch(0.48 0.07 150.5); 
+
+  --color-accent: oklch(0.62 0.08 149.8); /* Verde medio */
+  --color-accent-foreground: oklch(0.98 0.01 95.0); 
+
+  --color-muted: oklch(0.88 0.05 96.2); /* Beige floral */
+  --color-muted-foreground: oklch(0.48 0.07 150.5); 
+
+  --color-ring: oklch(0.48 0.07 150.5);
+
+  /* Ring sincronizado con primary */
+  --color-ring: oklch(0.62 0.14 114);
+
+  /* Custom gradients */
+  --color-gradient-olive: linear-gradient(135deg, oklch(0.62 0.14 114), oklch(0.58 0.13 114));
+  --color-gradient-botanical: linear-gradient(135deg, oklch(0.37 0.08 107), oklch(0.42 0.07 108));
+  --color-gradient-gold: linear-gradient(135deg, oklch(0.847 0.149 84.7), oklch(0.8 0.15 85));
+  --color-gradient-subtle: linear-gradient(180deg, oklch(0.95 0.02 95), oklch(0.97 0.01 95));
+}
  :root {
-    /* Romantic wedding color palette */
-    --background: 20 20% 98%;
-    --foreground: 340 15% 25%;
+    /* New wedding color palette - Olive dominant */
+    --background: oklch(0.95 0.02 95);
+    --foreground: oklch(0.15 0.05 95);
 
-    --card: 0 0% 100%;
-    --card-foreground: 340 15% 25%;
+    --card: oklch(0.97 0.01 95);
+    --card-foreground: oklch(0.15 0.05 95);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 340 15% 25%;
+    --popover: oklch(0.97 0.01 95);
+    --popover-foreground: oklch(0.15 0.05 95);
 
-    /* Soft rose primary */
-    --primary: 340 75% 65%;
-    --primary-foreground: 0 0% 100%;
+    /* Dorado primary */
+    --primary: oklch(0.847 0.149 84.7);
+    --primary-foreground: oklch(1 0 0);
 
-    /* Golden secondary */
-    --secondary: 45 85% 70%;
-    --secondary-foreground: 340 15% 25%;
+    /* Verde botanico secondary */
+    --secondary: oklch(0.37 0.08 107);
+    --secondary-foreground: oklch(1 0 0);
 
-    --muted: 20 15% 92%;
-    --muted-foreground: 340 10% 45%;
+    --muted: oklch(0.92 0.02 95);
+    --muted-foreground: oklch(0.4 0.05 95);
 
-    /* Peach accent */
-    --accent: 25 90% 75%;
-    --accent-foreground: 340 15% 25%;
+    /* Verde oliva accent */
+    --accent: oklch(0.37 0.08 107);
+    --accent-foreground: oklch(1 0 0);
 
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: oklch(0.55 0.22 25);
+    --destructive-foreground: oklch(1 0 0);
 
-    --border: 340 15% 90%;
-    --input: 340 15% 90%;
-    --ring: 340 75% 65%;
+    --border: oklch(0.88 0.02 95);
+    --input: oklch(0.88 0.02 95);
+    --ring: oklch(0.847 0.149 84.7);
 
     --radius: 1rem;
 
     /* Gradients */
-    --gradient-romantic: linear-gradient(135deg, hsl(340 75% 65%), hsl(25 90% 75%));
-    --gradient-subtle: linear-gradient(180deg, hsl(20 20% 98%), hsl(340 35% 95%));
-    --gradient-gold: linear-gradient(135deg, hsl(45 85% 70%), hsl(35 80% 65%));
+    --gradient-olive: linear-gradient(135deg, oklch(0.548 0.147 94.8), oklch(0.6 0.12 95));
+    --gradient-gold: linear-gradient(135deg, oklch(0.847 0.149 84.7), oklch(0.8 0.15 85));
+    --gradient-subtle: linear-gradient(180deg, oklch(0.95 0.02 95), oklch(0.97 0.01 95));
 
     /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(340 75% 65% / 0.15);
-    --shadow-glow: 0 0 30px hsl(340 75% 65% / 0.2);
-    
+    --shadow-soft: 0 4px 20px -4px oklch(0.37 0.08 107 / 0.15);
+    --shadow-glow: 0 0 30px oklch(0.847 0.149 84.7 / 0.2);
+
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 340 25% 8%;
-    --foreground: 20 20% 95%;
+    --background: oklch(0.12 0.03 95);
+    --foreground: oklch(0.9 0.02 95);
 
-    --card: 340 20% 12%;
-    --card-foreground: 20 20% 95%;
+    --card: oklch(0.18 0.03 95);
+    --card-foreground: oklch(0.9 0.02 95);
 
-    --popover: 340 20% 12%;
-    --popover-foreground: 20 20% 95%;
+    --popover: oklch(0.18 0.03 95);
+    --popover-foreground: oklch(0.9 0.02 95);
 
-    --primary: 340 75% 65%;
-    --primary-foreground: 0 0% 100%;
+    --primary: oklch(0.847 0.149 84.7);
+    --primary-foreground: oklch(1 0 0);
 
-    --secondary: 45 70% 55%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: oklch(0.37 0.08 107);
+    --secondary-foreground: oklch(1 0 0);
 
-    --muted: 340 15% 20%;
-    --muted-foreground: 20 15% 65%;
+    --muted: oklch(0.25 0.03 95);
+    --muted-foreground: oklch(0.7 0.02 95);
 
-    --accent: 25 80% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: oklch(0.37 0.08 107);
+    --accent-foreground: oklch(1 0 0);
 
-    --destructive: 0 62% 45%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: oklch(0.45 0.22 25);
+    --destructive-foreground: oklch(1 0 0);
 
-    --border: 340 20% 20%;
-    --input: 340 20% 20%;
-    --ring: 340 75% 65%;
+    --border: oklch(0.25 0.03 95);
+    --input: oklch(0.25 0.03 95);
+    --ring: oklch(0.847 0.149 84.7);
   }
 
 
-   .gradient-romantic {
-    background: var(--gradient-romantic);
-  }
+   .gradient-olive {
+     background: var(--gradient-olive);
+   }
 
-  .gradient-subtle {
-    background: var(--gradient-subtle);
-  }
+   .gradient-subtle {
+     background: var(--gradient-subtle);
+   }
 
-  .gradient-gold {
-    background: var(--gradient-gold);
-  }
+   .gradient-gold {
+     background: var(--gradient-gold);
+   }
 
   .shadow-soft {
     box-shadow: var(--shadow-soft);

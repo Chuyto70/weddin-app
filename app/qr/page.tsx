@@ -41,7 +41,7 @@ export default function QRPage() {
         </h1>
 
         <p className="text-gray-600 mb-8">
-          Imprime este código QR y colócalo en las mesas de los invitados. Al escanearlo, irán directamente a la aplicación de fotos de la boda de Jesús y Gabriela.
+          Imprime este código QR y colócalo en las mesas de los invitados. Al escanearlo, irán directamente a la aplicación de fotos de la boda de Gaby & Jesús.
         </p>
 
         {qrCodeUrl && (
@@ -49,7 +49,7 @@ export default function QRPage() {
             <div className="bg-white p-6 rounded-xl shadow-lg inline-block border-4 border-rose-100">
               <img
                 src={qrCodeUrl}
-                alt="Código QR para la boda de Jesús y Gabriela"
+                alt="Código QR para la boda de Gaby & Jesús"
                 className="w-80 h-80"
               />
             </div>

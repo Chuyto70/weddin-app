@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Camera, X, Check } from 'lucide-react';
+import { Camera, X, Check, GalleryHorizontal, BookImage, Eye } from 'lucide-react';
+import Link from 'next/link';
 
 export default function PhotoUpload() {
   const [isCapturing, setIsCapturing] = useState(false);
@@ -179,13 +180,14 @@ export default function PhotoUpload() {
       <div className="grid grid-cols-1 gap-4 mb-6">
         <button
           onClick={startCamera}
-          className="w-full bg-linear-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold py-6 px-8 rounded-xl flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-xl"
+          className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full"
         >
           
-          <span className="text-xl font-bold flex gap-2 items-center">📸  Tomar Foto</span>
+          <Camera size={24} className='self-end' />
+          <span className="text-xl font-bold flex gap-2 items-center">Tomar Foto</span>
         </button>
 
-        <div className="relative">
+        <div className="relative w-full">
           <input
             ref={fileInputRef}
             type="file"
@@ -195,11 +197,22 @@ export default function PhotoUpload() {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold py-6 px-8 rounded-xl flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-xl"
+            className="flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full"
           >
-            <span className="text-xl font-bold">🖼️ Elegir de la Galería</span>
+            <BookImage size={24} className='self-end' />
+            <span className="text-xl font-bold">Elegir de la Galería</span>
           </button>
         </div>
+        
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/gallery"
+                className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xl font-bold flex gap-2 items-center"
+              >
+                <Eye className='self-end' />
+                Ver Galería
+              </Link>
+            </div>
       </div>
 
       {isCapturing && (
@@ -226,7 +239,7 @@ export default function PhotoUpload() {
           {cameraReady && (
             <div className="absolute inset-0 flex flex-col pointer-events-auto">
               {/* Top bar with instructions */}
-              <div className="flex justify-between items-center p-4 bg-gradient-to-b from-black/50 to-transparent">
+              <div className="flex justify-between items-center p-4 bg-linear-to-b from-black/50 to-transparent">
                 <div className="bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
                   📹 Cámara Lista
                 </div>
@@ -275,7 +288,7 @@ export default function PhotoUpload() {
               <button
                 onClick={uploadPhoto}
                 disabled={isUploading}
-                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 text-lg"
+                className="flex-1 bg-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground text-accent-foreground font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 text-lg"
               >
                 {isUploading ? (
                   <>
@@ -290,7 +303,7 @@ export default function PhotoUpload() {
               </button>
               <button
                 onClick={() => setPreview(null)}
-                className="flex-1 bg-linear-to-r from-gray-500 to-slate-500 hover:from-gray-600 hover:to-slate-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 text-lg"
+                className="flex-1 bg-muted hover:bg-muted/90 text-muted-foreground font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 text-lg"
               >
                 ❌ Cancelar
               </button>
