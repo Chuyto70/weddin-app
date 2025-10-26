@@ -139,6 +139,18 @@ export default function PhotoGallery() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div
+            className="group aspect-square relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-card cursor-pointer"
+          >
+            <Image
+              src={"/welcome-image.jpeg"}
+              alt={`Foto de bienvenida de la boda`}
+              fill
+              unoptimized
+              className="object-cover group-hover:scale-110 transition-transform duration-500"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+            />
+          </div>
         {photos.map((photo, index) => (
           <div
             key={index}
