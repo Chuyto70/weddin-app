@@ -14,6 +14,8 @@ export default function PhotoUpload() {
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  
+
   const startCamera = async () => {
     setIsCapturing(true);
     try {
@@ -25,11 +27,12 @@ export default function PhotoUpload() {
       }
 
       // Try front camera first, then fallback to any available camera
-      let constraints: MediaStreamConstraints = {
+      const constraints: MediaStreamConstraints = {
         video: {
-          facingMode: 'user', // Front camera
-          width: { ideal: 720 },
-          height: { ideal: 1280 }
+          facingMode: 'user',
+          width: { ideal: 4096 }, // muy alto, el navegador bajará si no puede
+          height: { ideal: 2160 },
+          aspectRatio: { ideal: 9/16 }
         }
       };
 
@@ -39,12 +42,7 @@ export default function PhotoUpload() {
       } catch (frontCameraError) {
         // Fallback to any camera if front camera fails
         console.log('Cámara frontal no disponible, intentando cualquier cámara...');
-        constraints = {
-          video: {
-            width: { ideal: 720 },
-            height: { ideal: 1280 }
-          }
-        };
+        constraints.video = { width: { ideal: 1920 }, height: { ideal: 1080 } };
         stream = await navigator.mediaDevices.getUserMedia(constraints);
       }
 
