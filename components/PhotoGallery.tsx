@@ -26,7 +26,7 @@ export default function PhotoGallery() {
     try {
       const response = await fetch('/api/photos');
       const data = await response.json();
-      setPhotos(data.photos.map((url: string) => ({ url })));
+      setPhotos([{url:"/welcome-image.jpeg"}, ...data.photos.map((url: string) => ({ url }))]);
     } catch (error) {
       console.error('Error fetching photos:', error);
     } finally {
@@ -139,18 +139,7 @@ export default function PhotoGallery() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        <div
-            className="group aspect-square relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-card cursor-pointer"
-          >
-            <Image
-              src={"/welcome-image.jpeg"}
-              alt={`Foto de bienvenida de la boda`}
-              fill
-              unoptimized
-              className="object-cover group-hover:scale-110 transition-transform duration-500"
-              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
-            />
-          </div>
+      
         {photos.map((photo, index) => (
           <div
             key={index}
@@ -190,13 +179,13 @@ export default function PhotoGallery() {
           >
             <Download size={20} />
           </button>
-          <button
+         {selectedPhoto !== "/welcome-image.jpeg" && <button
             onClick={() => handleDeleteClick(selectedPhoto)}
             className="absolute top-4 left-4 z-10 bg-red-500/80 hover:bg-red-600 text-white p-3 rounded-full transition-all duration-200 shadow-lg"
             aria-label="Eliminar foto"
           >
             <Trash2 size={20} />
-          </button>
+          </button>}
           <div className="relative max-w-full max-h-full">
             <Image
               src={selectedPhoto}
