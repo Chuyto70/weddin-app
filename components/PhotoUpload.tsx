@@ -94,24 +94,25 @@ export default function PhotoUpload() {
   };
 
   const capturePhoto = () => {
-  if (!cameraReady) return; // Evita capturar antes de que esté lista la cámara
+  if (!cameraReady) return;
   if (videoRef.current && canvasRef.current) {
     const canvas = canvasRef.current;
     const video = videoRef.current;
-
-    // Si por alguna razón no hay dimensiones, pon un fallback
     const width = video.videoWidth || 720;
     const height = video.videoHeight || 1280;
-
     canvas.width = width;
     canvas.height = height;
-
     const ctx = canvas.getContext('2d');
     if (ctx) {
+      // quitar inversión al dibujar
+      ctx.save();
+      // Si el video está espejado, revertimos para la foto final
+      ctx.translate(width, 0);
+      ctx.scale(-1, 1);
       ctx.drawImage(video, 0, 0, width, height);
+      ctx.restore();
+
       const imageDataUrl = canvas.toDataURL('image/jpeg');
-      console.log('Capturando foto...', imageDataUrl);
-      
       setPreview(imageDataUrl);
       stopCamera();
     }
@@ -207,7 +208,7 @@ export default function PhotoUpload() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/gallery"
-                className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xl font-bold flex gap-2 items-center"
+                className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xl font-bold flex gap-2 items-center w-full"
               >
                 <Eye className='self-end' />
                 Ver Galería
