@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, Download } from 'lucide-react';
 
 interface Photo {
   url: string;
@@ -78,6 +78,31 @@ export default function PhotoGallery() {
     }
   };
 
+  const handleDownload = async (photoUrl: string) => {
+    try {
+      const response = await fetch(photoUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+
+      // Extract filename from URL or create one
+      const filename = photoUrl.split('/').pop() || `foto-boda-${Date.now()}.jpg`;
+      link.download = filename;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up the object URL
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading photo:', error);
+      alert('Error al descargar la foto');
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -145,6 +170,13 @@ export default function PhotoGallery() {
             aria-label="Cerrar imagen"
           >
             <X size={24} />
+          </button>
+          <button
+            onClick={() => handleDownload(selectedPhoto)}
+            className="absolute top-4 right-16 z-10 bg-primary/80 hover:bg-primary text-white p-3 rounded-full transition-all duration-200 shadow-lg"
+            aria-label="Descargar foto"
+          >
+            <Download size={20} />
           </button>
           <button
             onClick={() => handleDeleteClick(selectedPhoto)}
