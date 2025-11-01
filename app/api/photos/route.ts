@@ -20,6 +20,9 @@ export async function GET() {
       /\.(jpg|jpeg|png|gif|webp|mp4|mov|avi|webm)$/i.test(file)
     );
 
+    // Sort by filename in descending order (newest first, since filenames start with timestamp)
+    mediaFiles.sort((a, b) => b.localeCompare(a));
+
     // Return media URLs via API endpoint
     const photos = mediaFiles.map(file => `/api/photos/${file}`);
 
