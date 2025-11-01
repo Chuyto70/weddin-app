@@ -15,7 +15,7 @@ export default function GalleryPage() {
               className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xl font-bold flex gap-2 items-center"
             >
               <Camera className='self-end' />
-              Agregar Foto
+              Agregar Media
             </Link>
           </div>
         </div>

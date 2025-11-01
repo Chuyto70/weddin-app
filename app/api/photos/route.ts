@@ -15,13 +15,13 @@ export async function GET() {
       return NextResponse.json({ photos: [] });
     }
 
-    // Filter for image files
-    const imageFiles = files.filter(file =>
-      /\.(jpg|jpeg|png|gif|webp)$/i.test(file)
+    // Filter for image and video files
+    const mediaFiles = files.filter(file =>
+      /\.(jpg|jpeg|png|gif|webp|mp4|mov|avi|webm)$/i.test(file)
     );
 
-    // Return photo URLs via API endpoint
-    const photos = imageFiles.map(file => `/api/photos/${file}`);
+    // Return media URLs via API endpoint
+    const photos = mediaFiles.map(file => `/api/photos/${file}`);
 
     return NextResponse.json({ photos });
   } catch (error) {

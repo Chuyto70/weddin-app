@@ -11,6 +11,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'No file received.' });
     }
 
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ success: false, message: 'Tipo de archivo no permitido. Solo imágenes y videos.' });
+    }
+
+    // Check file size (50MB limit)
+    if (file.size > 50 * 1024 * 1024) {
+      return NextResponse.json({ success: false, message: 'Archivo demasiado grande. Máximo 50MB.' });
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 

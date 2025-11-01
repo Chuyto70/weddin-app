@@ -25,6 +25,18 @@ export async function GET(
       case 'webp':
         contentType = 'image/webp';
         break;
+      case 'mp4':
+        contentType = 'video/mp4';
+        break;
+      case 'mov':
+        contentType = 'video/quicktime';
+        break;
+      case 'avi':
+        contentType = 'video/x-msvideo';
+        break;
+      case 'webm':
+        contentType = 'video/webm';
+        break;
       case 'jpg':
       case 'jpeg':
       default:

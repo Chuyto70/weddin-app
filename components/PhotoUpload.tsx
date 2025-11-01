@@ -10,6 +10,7 @@ export default function PhotoUpload() {
   const [preview, setPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isVideo, setIsVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -121,15 +122,16 @@ export default function PhotoUpload() {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && (file.type.startsWith('image/') || file.type.startsWith('video/'))) {
       setSelectedFile(file);
+      setIsVideo(file.type.startsWith('video/'));
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
     } else if (file) {
-      alert('Por favor, selecciona un archivo de imagen válido.');
+      alert('Por favor, selecciona un archivo de imagen o video válido.');
     }
   };
 
@@ -150,6 +152,12 @@ export default function PhotoUpload() {
         file = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
       }
 
+      // Check file size (limit to 50MB for videos)
+      if (file.size > 50 * 1024 * 1024) {
+        alert('El archivo es demasiado grande. Máximo 50MB.');
+        return;
+      }
+
       const formData = new FormData();
       formData.append('file', file);
 
@@ -160,9 +168,10 @@ export default function PhotoUpload() {
 
       const result = await uploadResponse.json();
       if (result.success) {
-        alert('¡Foto subida exitosamente!');
+        alert(`¡${isVideo ? 'Video' : 'Foto'} subida exitosamente!`);
         setPreview(null);
         setSelectedFile(null);
+        setIsVideo(false);
         // Trigger gallery refresh with cache busting
         window.location.href = window.location.href;
       } else {
@@ -192,7 +201,7 @@ export default function PhotoUpload() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
             onChange={handleFileSelect}
             className="hidden"
           />
@@ -278,7 +287,11 @@ export default function PhotoUpload() {
         <div className="fixed inset-0 z-50 bg-black flex flex-col">
           <div className="flex-1 flex items-center justify-center p-4">
             <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden max-w-md w-full">
-              <img src={preview} alt="Preview" className="w-full h-96 md:h-[480px] object-cover" />
+              {isVideo ? (
+                <video src={preview} controls className="w-full h-96 md:h-[480px] object-cover" />
+              ) : (
+                <img src={preview} alt="Preview" className="w-full h-96 md:h-[480px] object-cover" />
+              )}
               <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
                 Vista Previa
               </div>

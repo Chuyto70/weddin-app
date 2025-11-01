@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 import { X, Trash2, Download } from 'lucide-react';
 
-interface Photo {
+interface Media {
   url: string;
+  isVideo: boolean;
 }
 
 export default function PhotoGallery() {
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photos, setPhotos] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -25,7 +26,12 @@ export default function PhotoGallery() {
     try {
       const response = await fetch('/api/photos');
       const data = await response.json();
-      setPhotos([{url:"/welcome-image.jpeg"}, ...data.photos.map((url: string) => ({ url }))]);
+      const mediaItems = data.photos.map((url: string) => {
+        const extension = url.split('.').pop()?.toLowerCase();
+        const isVideo = ['mp4', 'mov', 'avi', 'webm'].includes(extension || '');
+        return { url, isVideo };
+      });
+      setPhotos([{url:"/welcome-image.jpeg", isVideo: false}, ...mediaItems]);
     } catch (error) {
       console.error('Error fetching photos:', error);
     } finally {
@@ -62,16 +68,16 @@ export default function PhotoGallery() {
       });
 
       if (response.ok) {
-        setPhotos(photos.filter(photo => photo.url !== photoToDelete));
+        setPhotos(photos.filter(media => media.url !== photoToDelete));
         setShowDeleteDialog(false);
         setSelectedPhoto(null);
-        alert('Foto eliminada exitosamente');
+        alert('Media eliminada exitosamente');
       } else {
-        setDeleteError('Error al eliminar la foto');
+        setDeleteError('Error al eliminar la media');
       }
     } catch (error) {
-      console.error('Error deleting photo:', error);
-      setDeleteError('Error al eliminar la foto');
+      console.error('Error deleting media:', error);
+      setDeleteError('Error al eliminar la media');
     } finally {
       setIsDeleting(false);
     }
@@ -97,8 +103,8 @@ export default function PhotoGallery() {
       // Clean up the object URL
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading photo:', error);
-      alert('Error al descargar la foto');
+      console.error('Error downloading media:', error);
+      alert('Error al descargar la media');
     }
   };
 
@@ -133,26 +139,44 @@ export default function PhotoGallery() {
     <div className="w-full">
       <div className="flex items-center justify-between mb-8">
         <div className="text-sm text-muted-foreground bg-card/60 backdrop-blur-sm px-4 py-2 rounded-full">
-          {photos.length} {photos.length === 1 ? 'foto' : 'fotos'}
+          {photos.length} {photos.length === 1 ? 'archivo' : 'archivos'}
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-      
-        {photos.map((photo, index) => (
+
+        {photos.map((media, index) => (
           <div
             key={index}
             className="group aspect-square relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-card cursor-pointer"
-            onClick={() => setSelectedPhoto(photo.url)}
+            onClick={() => setSelectedPhoto(media.url)}
           >
-            <img
-              src={photo.url}
-              alt={`Foto de la boda ${index + 1}`}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            />
+            {media.isVideo ? (
+              <>
+                <video
+                  src={media.url}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  muted
+                  preload="metadata"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-black/60 backdrop-blur-sm text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <img
+                src={media.url}
+                alt={`Media de la boda ${index + 1}`}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              Foto {index + 1}
+              {media.isVideo ? 'Video' : 'Foto'} {index + 1}
             </div>
           </div>
         ))}
@@ -176,18 +200,31 @@ export default function PhotoGallery() {
             <Download size={20} />
           </button>
          {selectedPhoto !== "/welcome-image.jpeg" && <button
-            onClick={() => handleDeleteClick(selectedPhoto)}
-            className="absolute top-4 left-4 z-10 bg-red-500/80 hover:bg-red-600 text-white p-3 rounded-full transition-all duration-200 shadow-lg"
-            aria-label="Eliminar foto"
-          >
-            <Trash2 size={20} />
-          </button>}
+           onClick={() => handleDeleteClick(selectedPhoto)}
+           className="absolute top-4 left-4 z-10 bg-red-500/80 hover:bg-red-600 text-white p-3 rounded-full transition-all duration-200 shadow-lg"
+           aria-label="Eliminar media"
+         >
+           <Trash2 size={20} />
+         </button>}
           <div className="relative max-w-full max-h-full">
-            <img
-              src={selectedPhoto}
-              alt="Foto ampliada"
-              className="max-w-full max-h-full object-contain rounded-lg"
-            />
+            {selectedPhoto && (() => {
+              const extension = selectedPhoto.split('.').pop()?.toLowerCase();
+              const isVideo = ['mp4', 'mov', 'avi', 'webm'].includes(extension || '');
+              return isVideo ? (
+                <video
+                  src={selectedPhoto}
+                  controls
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                  autoPlay
+                />
+              ) : (
+                <img
+                  src={selectedPhoto}
+                  alt="Foto ampliada"
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
+              );
+            })()}
           </div>
         </div>
       )}
@@ -200,7 +237,7 @@ export default function PhotoGallery() {
               Confirmar eliminación
             </h3>
             <p className="text-white mb-4 text-center">
-              Ingresa la contraseña para eliminar esta foto:
+              Ingresa la contraseña para eliminar este archivo:
             </p>
             <input
               type="password"
