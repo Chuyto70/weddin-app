@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { X, Trash2, Download } from 'lucide-react';
 
 interface Photo {
@@ -146,13 +145,10 @@ export default function PhotoGallery() {
             className="group aspect-square relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-card cursor-pointer"
             onClick={() => setSelectedPhoto(photo.url)}
           >
-            <Image
+            <img
               src={photo.url}
               alt={`Foto de la boda ${index + 1}`}
-              fill
-              unoptimized
-              className="object-cover group-hover:scale-110 transition-transform duration-500"
-              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -187,12 +183,9 @@ export default function PhotoGallery() {
             <Trash2 size={20} />
           </button>}
           <div className="relative max-w-full max-h-full">
-            <Image
+            <img
               src={selectedPhoto}
               alt="Foto ampliada"
-              width={1200}
-              height={800}
-              unoptimized
               className="max-w-full max-h-full object-contain rounded-lg"
             />
           </div>

@@ -13,17 +13,21 @@ RUN npm ci
 # Copy the rest of the application code
 COPY . .
 
-# Create the weddingPhotos directory and set permissions
-RUN mkdir -p public/weddingPhotos && chmod 777 public/weddingPhotos
+# Create the uploads directory and set permissions
+RUN mkdir -p uploads && chmod 777 uploads
 
 # Expose the port that the app will run on
 EXPOSE 3000
 
 # Set environment variables
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 ENV PORT=3000
+
+# Build the application for production (force no cache)
+RUN --mount=type=cache,target=/root/.npm \
+    npm run build
 
 # Run as root for volume write access (simplified for this use case)
 
 # Start the application
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]

@@ -163,8 +163,8 @@ export default function PhotoUpload() {
         alert('¡Foto subida exitosamente!');
         setPreview(null);
         setSelectedFile(null);
-        // Trigger gallery refresh (we'll handle this in the parent component)
-        window.location.reload();
+        // Trigger gallery refresh with cache busting
+        window.location.href = window.location.href;
       } else {
         alert('Subida fallida. Por favor, intenta de nuevo.');
       }

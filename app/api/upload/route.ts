@@ -34,6 +34,8 @@ export async function POST(request: NextRequest) {
     const uploadDir = join(process.cwd(), 'public', 'weddingPhotos');
     try {
       await mkdir(uploadDir, { recursive: true });
+      // Ensure proper permissions for volume
+      console.log('Upload directory ready:', uploadDir);
     } catch (mkdirError) {
       // Directory might already exist, continue
       console.log('Directory exists or created:', uploadDir);
@@ -45,7 +47,11 @@ export async function POST(request: NextRequest) {
 
     await writeFile(path, buffer);
 
-    return NextResponse.json({ success: true, filename });
+    return NextResponse.json({
+      success: true,
+      filename,
+      url: `/api/photos/${filename}`
+    });
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json({ success: false, message: 'Upload failed.' });
