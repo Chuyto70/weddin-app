@@ -27,6 +27,9 @@ ENV PORT=3000
 RUN --mount=type=cache,target=/root/.npm \
     npm run build
 
+# Create a volume for persistent photo storage
+VOLUME ["/app/public/weddingPhotos"]
+
 # Run as root for volume write access (simplified for this use case)
 
 # Start the application
