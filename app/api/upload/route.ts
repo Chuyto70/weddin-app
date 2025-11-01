@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Production - save to mounted volume
-    const uploadDir = join(process.cwd(), 'public', 'weddingPhotos');
+    const uploadDir = join(process.cwd(), 'uploads', 'weddingPhotos');
     try {
       await mkdir(uploadDir, { recursive: true });
       // Ensure proper permissions for volume

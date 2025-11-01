@@ -4,7 +4,7 @@ import { join } from 'path';
 
 export async function GET() {
   try {
-    const photosDir = join(process.cwd(), 'public', 'weddingPhotos');
+    const photosDir = join(process.cwd(), 'uploads', 'weddingPhotos');
     console.log('Reading photos from:', photosDir);
 
     let files: string[] = [];

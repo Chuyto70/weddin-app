@@ -31,7 +31,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete from local filesystem
-    const filePath = join(process.cwd(), 'public', 'weddingPhotos', filename);
+    const filePath = join(process.cwd(), 'uploads', 'weddingPhotos', filename);
 
     try {
       await unlink(filePath);

@@ -14,7 +14,7 @@ RUN npm ci
 COPY . .
 
 # Create the uploads and weddingPhotos directories and set permissions
-RUN mkdir -p uploads public/weddingPhotos && chmod 777 uploads public/weddingPhotos
+RUN mkdir -p uploads/weddingPhotos && chmod 777 uploads/weddingPhotos
 
 # Expose the port that the app will run on
 EXPOSE 3000

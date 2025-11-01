@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { filename } = await params;
-    const filePath = join(process.cwd(), 'public', 'weddingPhotos', filename);
+    const filePath = join(process.cwd(), 'uploads', 'weddingPhotos', filename);
     const imageBuffer = await readFile(filePath);
 
     // Detect MIME type based on file extension
