@@ -6,7 +6,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const { photoUrl } = await request.json();
 
-    if (!photoUrl) {
+    if (!photoUrl) { 
       return NextResponse.json({ success: false, message: 'No photo URL provided.' });
     }
 
