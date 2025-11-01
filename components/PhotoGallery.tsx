@@ -206,7 +206,7 @@ export default function PhotoGallery() {
          >
            <Trash2 size={20} />
          </button>}
-          <div className="relative max-w-full max-h-full">
+          <div className="relative max-w-full max-h-full h-full flex items-center justify-center">
             {selectedPhoto && (() => {
               const extension = selectedPhoto.split('.').pop()?.toLowerCase();
               const isVideo = ['mp4', 'mov', 'avi', 'webm'].includes(extension || '');
