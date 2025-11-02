@@ -1,32 +1,20 @@
-# Use the official Node.js 18 Alpine image as the base
-FROM node:20-alpine
-
-# Set the working directory inside the container
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Copy package.json and package-lock.json (if available)
 COPY package*.json ./
-
-# Install dependencies
 RUN npm ci
-
-# Copy the rest of the application code
 COPY . .
+RUN npm run build
 
-# Create the uploads and weddingPhotos directories and set permissions
-RUN mkdir -p uploads/weddingPhotos && chmod 777 uploads/weddingPhotos
-
-# Expose the port that the app will run on
-EXPOSE 3000
-
-# Set environment variables
+FROM node:20-alpine AS runner
+WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Build the application for production (force no cache)
-RUN npm run build
+COPY --from=builder /app/package*.json ./
+RUN npm ci --omit=dev
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/uploads ./uploads
 
-# Run as root for volume write access (simplified for this use case)
-
-# Start the application
+EXPOSE 3000
 CMD ["npm", "start"]

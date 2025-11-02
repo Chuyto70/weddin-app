@@ -4,7 +4,7 @@ services:
   wedding-photo-app:
     build: .
     ports:
-      - "3002:3000"
+      - "3003:3000"
     networks:
       - dokploy-network
     environment:
