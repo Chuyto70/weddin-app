@@ -14,7 +14,7 @@ COPY --from=builder /app/package*.json ./
 RUN npm ci --omit=dev
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/uploads ./uploads
+#COPY --from=builder /app/uploads ./uploads
 
 EXPOSE 3000
 CMD ["npm", "start"]
