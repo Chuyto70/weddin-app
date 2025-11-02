@@ -24,7 +24,7 @@ export default function Home() {
             </div>
              <p className='text-primary italic'>22-11-2025</p>
             <h2 className="text-2xl font-semibold text-foreground mb-2">
-              ¡Captura un momento especial TEST!
+              ¡Captura un momento especial!
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto">
               Comparte fotos de la boda de  <br></br> Gaby & Jesús. <br></br> ¡Haz clic en &quot;Tomar Foto&quot; o &quot;Elegir de la Galería&quot;!
