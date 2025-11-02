@@ -24,8 +24,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 
 # Build the application for production (force no cache)
-RUN --mount=type=cache,target=/root/.npm \
-    npm run build
+RUN npm run build
 
 # Run as root for volume write access (simplified for this use case)
 
