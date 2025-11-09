@@ -26,6 +26,14 @@ export default function PhotoGallery() {
     fetchPhotos();
   }, []);
 
+  const preloadImages = (imageUrls: string[]) => {
+    imageUrls.forEach(url => {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => handleImageLoad(url);
+    });
+  };
+
   const fetchPhotos = async () => {
     try {
       const response = await fetch('/api/photos');
@@ -35,7 +43,12 @@ export default function PhotoGallery() {
         const isVideo = ['mp4', 'mov', 'avi', 'webm'].includes(extension || '');
         return { url, isVideo };
       });
-      setPhotos([{url:"/welcome-image.jpeg", isVideo: false}, ...mediaItems]);
+      const allPhotos = [{url:"/welcome-image.jpeg", isVideo: false}, ...mediaItems];
+      setPhotos(allPhotos);
+
+      // Preload all images for better performance in fullscreen viewer
+      const imageUrls = allPhotos.filter(media => !media.isVideo).map(media => media.url);
+      preloadImages(imageUrls);
     } catch (error) {
       console.error('Error fetching photos:', error);
     } finally {
@@ -319,7 +332,11 @@ export default function PhotoGallery() {
                     alt="Foto ampliada"
                     className="max-w-full max-h-full object-contain rounded-lg"
                     onLoad={() => handleImageLoad(selectedPhoto)}
-                    style={{ display: loadedImages[selectedPhoto] ? 'block' : 'none' }}
+                    style={{
+                      display: loadedImages[selectedPhoto] ? 'block' : 'none',
+                      opacity: loadedImages[selectedPhoto] ? 1 : 0,
+                      transition: 'opacity 0.3s ease-in-out'
+                    }}
                   />
                 </div>
               );
