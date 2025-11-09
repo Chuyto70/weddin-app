@@ -12,11 +12,14 @@ export default function PhotoGallery() {
   const [photos, setPhotos] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
   const [password, setPassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   useEffect(() => {
     fetchPhotos();
@@ -71,6 +74,7 @@ export default function PhotoGallery() {
         setPhotos(photos.filter(media => media.url !== photoToDelete));
         setShowDeleteDialog(false);
         setSelectedPhoto(null);
+        setCurrentIndex(null);
         alert('Media eliminada exitosamente');
       } else {
         setDeleteError('Error al eliminar la media');
@@ -80,6 +84,45 @@ export default function PhotoGallery() {
       setDeleteError('Error al eliminar la media');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const navigateToNext = () => {
+    if (currentIndex !== null && currentIndex < photos.length - 1) {
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      setSelectedPhoto(photos[nextIndex].url);
+    }
+  };
+
+  const navigateToPrevious = () => {
+    if (currentIndex !== null && currentIndex > 0) {
+      const prevIndex = currentIndex - 1;
+      setCurrentIndex(prevIndex);
+      setSelectedPhoto(photos[prevIndex].url);
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      navigateToNext();
+    }
+    if (isRightSwipe) {
+      navigateToPrevious();
     }
   };
 
@@ -149,7 +192,10 @@ export default function PhotoGallery() {
           <div
             key={index}
             className="group aspect-square relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 bg-card cursor-pointer"
-            onClick={() => setSelectedPhoto(media.url)}
+            onClick={() => {
+              setSelectedPhoto(media.url);
+              setCurrentIndex(index);
+            }}
           >
             {media.isVideo ? (
               <>
@@ -184,9 +230,17 @@ export default function PhotoGallery() {
 
       {/* Fullscreen Image Viewer */}
       {selectedPhoto && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <button
-            onClick={() => setSelectedPhoto(null)}
+            onClick={() => {
+              setSelectedPhoto(null);
+              setCurrentIndex(null);
+            }}
             className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 shadow-lg"
             aria-label="Cerrar imagen"
           >
@@ -206,6 +260,28 @@ export default function PhotoGallery() {
          >
            <Trash2 size={20} />
          </button>}
+          {currentIndex !== null && currentIndex > 0 && (
+            <button
+              onClick={navigateToPrevious}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-4 rounded-full transition-all duration-200 shadow-lg"
+              aria-label="Imagen anterior"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15 18l-6-6 6-6v12z"/>
+              </svg>
+            </button>
+          )}
+          {currentIndex !== null && currentIndex < photos.length - 1 && (
+            <button
+              onClick={navigateToNext}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-4 rounded-full transition-all duration-200 shadow-lg"
+              aria-label="Imagen siguiente"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 18l6-6-6-6v12z"/>
+              </svg>
+            </button>
+          )}
           <div className="relative max-w-full max-h-full h-full flex items-center justify-center">
             {selectedPhoto && (() => {
               const extension = selectedPhoto.split('.').pop()?.toLowerCase();
@@ -226,6 +302,11 @@ export default function PhotoGallery() {
               );
             })()}
           </div>
+          {currentIndex !== null && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+              {currentIndex + 1} / {photos.length}
+            </div>
+          )}
         </div>
       )}
 
