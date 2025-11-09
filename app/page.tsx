@@ -16,7 +16,7 @@ export default function Home() {
       </header> */}
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto flex">
+      <main className="max-w-4xl mx-auto flex flex-1">
         <div className="bg-card rounded-2xl shadow-xl p-6 md:p-6">
           <div className="text-center mb-4">
             <div className="inline-flex items-center justify-center bg-accent mb-4 rounded-full w-40 h-40">

@@ -20,6 +20,7 @@ export default function PhotoGallery() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchPhotos();
@@ -126,6 +127,10 @@ export default function PhotoGallery() {
     }
   };
 
+  const handleImageLoad = (url: string) => {
+    setLoadedImages(prev => ({ ...prev, [url]: true }));
+  };
+
   const handleDownload = async (photoUrl: string) => {
     try {
       const response = await fetch(photoUrl);
@@ -214,11 +219,20 @@ export default function PhotoGallery() {
                 </div>
               </>
             ) : (
-              <img
-                src={media.url}
-                alt={`Media de la boda ${index + 1}`}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
+              <div className="relative w-full h-full">
+                {!loadedImages[media.url] && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-card">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+                  </div>
+                )}
+                <img
+                  src={media.url}
+                  alt={`Media de la boda ${index + 1}`}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  onLoad={() => handleImageLoad(media.url)}
+                  style={{ display: loadedImages[media.url] ? 'block' : 'none' }}
+                />
+              </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -294,11 +308,20 @@ export default function PhotoGallery() {
                   autoPlay
                 />
               ) : (
-                <img
-                  src={selectedPhoto}
-                  alt="Foto ampliada"
-                  className="max-w-full max-h-full object-contain rounded-lg"
-                />
+                <div className="relative">
+                  {!loadedImages[selectedPhoto] && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
+                      <div className="animate-spin rounded-full h-12 w-12 border-2 border-white border-t-transparent"></div>
+                    </div>
+                  )}
+                  <img
+                    src={selectedPhoto}
+                    alt="Foto ampliada"
+                    className="max-w-full max-h-full object-contain rounded-lg"
+                    onLoad={() => handleImageLoad(selectedPhoto)}
+                    style={{ display: loadedImages[selectedPhoto] ? 'block' : 'none' }}
+                  />
+                </div>
               );
             })()}
           </div>
