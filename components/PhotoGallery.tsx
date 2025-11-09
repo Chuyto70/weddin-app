@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X, Trash2, Download } from 'lucide-react';
+import Image from 'next/image';
 
 interface Media {
   url: string;
@@ -28,7 +29,7 @@ export default function PhotoGallery() {
 
   const preloadImages = (imageUrls: string[]) => {
     imageUrls.forEach(url => {
-      const img = new Image();
+      const img = document.createElement('img');
       img.src = url;
       img.onload = () => handleImageLoad(url);
     });
@@ -238,7 +239,7 @@ export default function PhotoGallery() {
                     <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
                   </div>
                 )}
-                <img
+                <Image
                   src={media.url}
                   alt={`Media de la boda ${index + 1}`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -327,7 +328,7 @@ export default function PhotoGallery() {
                       <div className="animate-spin rounded-full h-12 w-12 border-2 border-white border-t-transparent"></div>
                     </div>
                   )}
-                  <img
+                  <Image
                     src={selectedPhoto}
                     alt="Foto ampliada"
                     className="max-w-full max-h-full object-contain rounded-lg"
