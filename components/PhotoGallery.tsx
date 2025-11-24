@@ -348,22 +348,11 @@ export default function PhotoGallery() {
                 />
               ) : (
                 <div className="relative">
-                  {!loadedImages[selectedPhoto] && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
-                      <div className="animate-spin rounded-full h-12 w-12 border-2 border-white border-t-transparent"></div>
-                    </div>
-                  )}
                   <img
                     src={selectedPhoto}
                     alt="Foto ampliada"
                     loading="lazy"
                     className="max-w-full max-h-full object-contain rounded-lg w-full h-full"
-                    onLoad={() => handleImageLoad(selectedPhoto)}
-                    style={{
-                      display: loadedImages[selectedPhoto] ? 'block' : 'none',
-                      opacity: loadedImages[selectedPhoto] ? 1 : 0,
-                      transition: 'opacity 0.3s ease-in-out'
-                    }}
                   />
                 </div>
               );
