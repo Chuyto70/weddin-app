@@ -1,22 +1,24 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Camera, X, Check, GalleryHorizontal, BookImage, Eye } from 'lucide-react';
+import { Camera, X, BookImage, Eye } from 'lucide-react';
 import Link from 'next/link';
+
+interface PreviewItem {
+  url: string;
+  isVideo: boolean;
+}
 
 export default function PhotoUpload() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [previews, setPreviews] = useState<PreviewItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isVideo, setIsVideo] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  
 
   const startCamera = async () => {
     setIsCapturing(true);
@@ -34,14 +36,14 @@ export default function PhotoUpload() {
           facingMode: 'user',
           width: { ideal: 4096 }, // muy alto, el navegador bajará si no puede
           height: { ideal: 2160 },
-          aspectRatio: { ideal: 9/16 }
+          aspectRatio: { ideal: 9 / 16 }
         }
       };
 
       let stream;
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
-      } catch (frontCameraError) {
+      } catch (error) {
         // Fallback to any camera if front camera fails
         console.log('Cámara frontal no disponible, intentando cualquier cámara...');
         constraints.video = { width: { ideal: 1920 }, height: { ideal: 1080 } };
@@ -91,75 +93,85 @@ export default function PhotoUpload() {
     }
     setIsCapturing(false);
     setCameraReady(false);
-    setSelectedFile(null);
+    setSelectedFiles([]);
   };
 
   const capturePhoto = () => {
-  if (!cameraReady) return;
-  if (videoRef.current && canvasRef.current) {
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
-    const width = video.videoWidth || 720;
-    const height = video.videoHeight || 1280;
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      // quitar inversión al dibujar
-      ctx.save();
-      // Si el video está espejado, revertimos para la foto final
-      ctx.translate(width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, width, height);
-      ctx.restore();
+    if (!cameraReady) return;
+    if (videoRef.current && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+      const width = video.videoWidth || 720;
+      const height = video.videoHeight || 1280;
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // quitar inversión al dibujar
+        ctx.save();
+        // Si el video está espejado, revertimos para la foto final
+        ctx.translate(width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, width, height);
+        ctx.restore();
 
-      const imageDataUrl = canvas.toDataURL('image/jpeg');
-      setPreview(imageDataUrl);
-      stopCamera();
+        const imageDataUrl = canvas.toDataURL('image/jpeg');
+        setPreviews([{ url: imageDataUrl, isVideo: false }]);
+        stopCamera();
+      }
     }
-  }
-};
+  };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && (file.type.startsWith('image/') || file.type.startsWith('video/'))) {
-      setSelectedFile(file);
-      setIsVideo(file.type.startsWith('video/'));
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else if (file) {
-      alert('Por favor, selecciona un archivo de imagen o video válido.');
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const newFiles: File[] = [];
+      const newPreviews: PreviewItem[] = [];
+
+      Array.from(files).forEach(file => {
+        if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+          newFiles.push(file);
+          newPreviews.push({
+            url: URL.createObjectURL(file),
+            isVideo: file.type.startsWith('video/')
+          });
+        }
+      });
+
+      if (newFiles.length > 0) {
+        setSelectedFiles(newFiles);
+        setPreviews(newPreviews);
+      } else {
+        alert('Por favor, selecciona archivos de imagen o video válidos.');
+      }
     }
   };
 
   const uploadPhoto = async () => {
-    if (!preview) return;
+    if (previews.length === 0) return;
 
     setIsUploading(true);
     try {
-      let file: File;
-
-      if (selectedFile) {
-        // Use selected file from gallery
-        file = selectedFile;
-      } else {
-        // Convert data URL to blob (from camera)
-        const response = await fetch(preview);
-        const blob = await response.blob();
-        file = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
-      }
-
-      // Check file size (limit to 50MB for videos)
-      if (file.size > 50 * 1024 * 1024) {
-        alert('El archivo es demasiado grande. Máximo 50MB.');
-        return;
-      }
-
       const formData = new FormData();
-      formData.append('file', file);
+
+      if (selectedFiles.length > 0) {
+        // Use selected files from gallery
+        for (const file of selectedFiles) {
+          // Check file size (limit to 50MB for videos)
+          if (file.size > 50 * 1024 * 1024) {
+            alert(`El archivo ${file.name} es demasiado grande. Máximo 50MB.`);
+            setIsUploading(false);
+            return;
+          }
+          formData.append('file', file);
+        }
+      } else if (previews.length === 1) {
+        // Convert data URL to blob (from camera)
+        const response = await fetch(previews[0].url);
+        const blob = await response.blob();
+        const file = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
+        formData.append('file', file);
+      }
 
       const uploadResponse = await fetch('/api/upload', {
         method: 'POST',
@@ -168,10 +180,9 @@ export default function PhotoUpload() {
 
       const result = await uploadResponse.json();
       if (result.success) {
-        alert(`¡${isVideo ? 'Video' : 'Foto'} subida exitosamente!`);
-        setPreview(null);
-        setSelectedFile(null);
-        setIsVideo(false);
+        alert(`¡${selectedFiles.length > 1 ? 'Archivos subidos' : (previews[0].isVideo ? 'Video subido' : 'Foto subida')} exitosamente!`);
+        setPreviews([]);
+        setSelectedFiles([]);
         // Trigger gallery refresh with cache busting
         window.location.href = window.location.href;
       } else {
@@ -192,7 +203,7 @@ export default function PhotoUpload() {
           onClick={startCamera}
           className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full"
         >
-          
+
           <Camera size={24} className='self-end' />
           <span className="text-xl font-bold flex gap-2 items-center">Tomar Foto</span>
         </button>
@@ -201,7 +212,8 @@ export default function PhotoUpload() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
+            multiple
             onChange={handleFileSelect}
             className="hidden"
           />
@@ -213,16 +225,16 @@ export default function PhotoUpload() {
             <span className="text-xl font-bold">Elegir de la Galería</span>
           </button>
         </div>
-        
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/gallery"
-                className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xl font-bold flex gap-2 items-center w-full"
-              >
-                <Eye className='self-end' />
-                Ver Galería
-              </Link>
-            </div>
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Link
+            href="/gallery"
+            className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xl font-bold flex gap-2 items-center w-full"
+          >
+            <Eye className='self-end' />
+            Ver Galería
+          </Link>
+        </div>
       </div>
 
       {isCapturing && (
@@ -283,21 +295,43 @@ export default function PhotoUpload() {
         </div>
       )}
 
-      {preview && (
+      {previews.length > 0 && (
         <div className="fixed inset-0 z-50 bg-black flex flex-col">
-          <div className="flex-1 flex items-center justify-center p-4">
-            <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden max-w-md w-full">
-              {isVideo ? (
-                <video src={preview} controls className="w-full h-96 md:h-[480px] object-cover" />
-              ) : (
-                <img src={preview} alt="Preview" className="w-full h-96 md:h-[480px] object-cover" />
-              )}
-              <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
-                Vista Previa
+          <div className="flex-1 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden max-w-4xl w-full max-h-full flex flex-col">
+              <div className="p-4 bg-black/5 border-b flex justify-between items-center">
+                <h3 className="font-bold text-lg">Vista Previa ({previews.length} archivo{previews.length !== 1 ? 's' : ''})</h3>
+                <div className="bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
+                  {previews.length === 1 ? (previews[0].isVideo ? 'Video' : 'Foto') : 'Galería'}
+                </div>
+              </div>
+
+              <div className="p-4 overflow-y-auto flex-1">
+                {previews.length === 1 ? (
+                  <div className="flex justify-center">
+                    {previews[0].isVideo ? (
+                      <video src={previews[0].url} controls className="max-w-full max-h-[60vh] object-contain rounded-lg" />
+                    ) : (
+                      <img src={previews[0].url} alt="Preview" className="max-w-full max-h-[60vh] object-contain rounded-lg" />
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {previews.map((item, index) => (
+                      <div key={index} className="relative aspect-square">
+                        {item.isVideo ? (
+                          <video src={item.url} className="w-full h-full object-cover rounded-lg" />
+                        ) : (
+                          <img src={item.url} alt={`Preview ${index}`} className="w-full h-full object-cover rounded-lg" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
-          <div className="p-4">
+          <div className="p-4 bg-black/80 backdrop-blur-sm">
             <div className="flex gap-3 max-w-md mx-auto">
               <button
                 onClick={uploadPhoto}
@@ -316,7 +350,10 @@ export default function PhotoUpload() {
                 )}
               </button>
               <button
-                onClick={() => setPreview(null)}
+                onClick={() => {
+                  setPreviews([]);
+                  setSelectedFiles([]);
+                }}
                 className="flex-1 bg-muted hover:bg-muted/90 text-muted-foreground font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 text-lg"
               >
                 ❌ Cancelar

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { X, Trash2, Download } from 'lucide-react';
 import Image from 'next/image';
 
@@ -12,6 +12,8 @@ interface Media {
 export default function PhotoGallery() {
   const [photos, setPhotos] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -22,34 +24,59 @@ export default function PhotoGallery() {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchPhotos();
+    fetchPhotos(1);
   }, []);
 
-  const preloadImages = (imageUrls: string[]) => {
-    imageUrls.forEach(url => {
-      const img = document.createElement('img');
-      img.src = url;
-      img.onload = () => handleImageLoad(url);
-    });
-  };
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          setPage(prev => prev + 1);
+        }
+      },
+      { threshold: 1.0 }
+    );
 
-  const fetchPhotos = async () => {
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [hasMore, loading]);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchPhotos(page);
+    }
+  }, [page]);
+
+  const fetchPhotos = async (pageNum: number) => {
     try {
-      const response = await fetch('/api/photos');
+      setLoading(true);
+      const response = await fetch(`/api/photos?page=${pageNum}&limit=2000`);
       const data = await response.json();
+
       const mediaItems = data.photos.map((url: string) => {
         const extension = url.split('.').pop()?.toLowerCase();
         const isVideo = ['mp4', 'mov', 'avi', 'webm'].includes(extension || '');
         return { url, isVideo };
       });
-      const allPhotos = [{url:"/welcome-image.jpeg", isVideo: false}, ...mediaItems];
-      setPhotos(allPhotos);
 
-      // Preload all images for better performance in fullscreen viewer
-      const imageUrls = allPhotos.filter(media => !media.isVideo).map(media => media.url);
-      preloadImages(imageUrls);
+      if (pageNum === 1) {
+        const allPhotos = [{ url: "/welcome-image.jpeg", isVideo: false }, ...mediaItems];
+        setPhotos(allPhotos);
+      } else {
+        setPhotos(prev => [...prev, ...mediaItems]);
+      }
+
+      setHasMore(data.hasMore);
     } catch (error) {
       console.error('Error fetching photos:', error);
     } finally {
@@ -67,8 +94,7 @@ export default function PhotoGallery() {
   const handleDeleteConfirm = async () => {
     if (!photoToDelete || !password) return;
 
-    // Check password (you can change this to whatever password you want)
-    const correctPassword = 'daqa1503*'; // Change this to your desired password
+    const correctPassword = 'daqa1503*';
 
     if (password !== correctPassword) {
       setDeleteError('Contraseña incorrecta');
@@ -153,16 +179,12 @@ export default function PhotoGallery() {
 
       const link = document.createElement('a');
       link.href = url;
-
-      // Extract filename from URL or create one
       const filename = photoUrl.split('/').pop() || `foto-boda-${Date.now()}.jpg`;
       link.download = filename;
 
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Clean up the object URL
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading media:', error);
@@ -170,7 +192,7 @@ export default function PhotoGallery() {
     }
   };
 
-  if (loading) {
+  if (loading && page === 1) {
     return (
       <div className="text-center py-12">
         <div className="inline-flex items-center gap-3 bg-card/80 backdrop-blur-sm rounded-2xl px-8 py-6 shadow-lg">
@@ -181,7 +203,7 @@ export default function PhotoGallery() {
     );
   }
 
-  if (photos.length === 0) {
+  if (photos.length === 0 && !loading) {
     return (
       <div className="text-center py-12">
         <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-12 shadow-lg border border-border">
@@ -206,7 +228,6 @@ export default function PhotoGallery() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-
         {photos.map((media, index) => (
           <div
             key={index}
@@ -227,24 +248,21 @@ export default function PhotoGallery() {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="bg-black/60 backdrop-blur-sm text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7z"/>
+                      <path d="M8 5v14l11-7z" />
                     </svg>
                   </div>
                 </div>
               </>
             ) : (
               <div className="relative w-full h-full">
-                {!loadedImages[media.url] && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-card">
-                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
-                  </div>
-                )}
                 <Image
                   src={media.url}
                   alt={`Media de la boda ${index + 1}`}
+                  width={500}
+                  height={500}
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  onLoad={() => handleImageLoad(media.url)}
-                  style={{ display: loadedImages[media.url] ? 'block' : 'none' }}
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                 />
               </div>
             )}
@@ -254,6 +272,13 @@ export default function PhotoGallery() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Intersection Observer Target */}
+      <div ref={observerTarget} className="h-10 w-full flex items-center justify-center mt-8">
+        {loading && page > 1 && (
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent"></div>
+        )}
       </div>
 
       {/* Fullscreen Image Viewer */}
@@ -281,13 +306,13 @@ export default function PhotoGallery() {
           >
             <Download size={20} />
           </button>
-         {selectedPhoto !== "/welcome-image.jpeg" && <button
-           onClick={() => handleDeleteClick(selectedPhoto)}
-           className="absolute top-4 left-4 z-10 bg-red-500/80 hover:bg-red-600 text-white p-3 rounded-full transition-all duration-200 shadow-lg"
-           aria-label="Eliminar media"
-         >
-           <Trash2 size={20} />
-         </button>}
+          {selectedPhoto !== "/welcome-image.jpeg" && <button
+            onClick={() => handleDeleteClick(selectedPhoto)}
+            className="absolute top-4 left-4 z-10 bg-red-500/80 hover:bg-red-600 text-white p-3 rounded-full transition-all duration-200 shadow-lg"
+            aria-label="Eliminar media"
+          >
+            <Trash2 size={20} />
+          </button>}
           {currentIndex !== null && currentIndex > 0 && (
             <button
               onClick={navigateToPrevious}
@@ -295,7 +320,7 @@ export default function PhotoGallery() {
               aria-label="Imagen anterior"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M15 18l-6-6 6-6v12z"/>
+                <path d="M15 18l-6-6 6-6v12z" />
               </svg>
             </button>
           )}
@@ -306,7 +331,7 @@ export default function PhotoGallery() {
               aria-label="Imagen siguiente"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 18l6-6-6-6v12z"/>
+                <path d="M9 18l6-6-6-6v12z" />
               </svg>
             </button>
           )}
@@ -328,10 +353,11 @@ export default function PhotoGallery() {
                       <div className="animate-spin rounded-full h-12 w-12 border-2 border-white border-t-transparent"></div>
                     </div>
                   )}
-                  <Image
+                  <img
                     src={selectedPhoto}
                     alt="Foto ampliada"
-                    className="max-w-full max-h-full object-contain rounded-lg"
+                    loading="lazy"
+                    className="max-w-full max-h-full object-contain rounded-lg w-full h-full"
                     onLoad={() => handleImageLoad(selectedPhoto)}
                     style={{
                       display: loadedImages[selectedPhoto] ? 'block' : 'none',

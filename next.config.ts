@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     domains: [], // Allow images from any domain since we're serving from public folder
-    unoptimized: false, // Disable Next.js image optimization for uploaded photos
   },
   // Enable camera permissions for camera access
   async headers() {
